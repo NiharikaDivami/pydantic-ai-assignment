@@ -14,6 +14,22 @@ os.environ["GOOGLE_API_KEY"] = "AIzaSyBhnmNFSlcu2HLoP2ltKf7cDrofA97dhJw"
 cart_items: Dict[str, int] = {}
 _message_history: List[dict] = []
 
+# Product catalog
+AVAILABLE_PRODUCTS = [
+    {"name": "Apple", "price": 1.99, "emoji": "🍎"},
+    {"name": "Banana", "price": 0.99, "emoji": "🍌"},
+    {"name": "Orange", "price": 1.49, "emoji": "🍊"},
+    {"name": "Grapes", "price": 3.99, "emoji": "🍇"},
+    {"name": "Strawberry", "price": 4.99, "emoji": "🍓"},
+    {"name": "Watermelon", "price": 5.99, "emoji": "🍉"},
+    {"name": "Pineapple", "price": 3.49, "emoji": "🍍"},
+    {"name": "Mango", "price": 2.99, "emoji": "🥭"},
+    {"name": "Peach", "price": 2.49, "emoji": "🍑"},
+    {"name": "Cherries", "price": 5.49, "emoji": "🍒"},
+    {"name": "Kiwi", "price": 1.79, "emoji": "🥝"},
+    {"name": "Avocado", "price": 2.29, "emoji": "🥑"},
+]
+
 # Create PydanticAI agent with Google Gemini
 model = "google-gla:gemini-2.5-flash"
 agent = Agent(
@@ -22,7 +38,9 @@ agent = Agent(
 You can help users manage their shopping cart by adding items, removing items, showing the cart, and clearing it.
 When users ask to add items, extract the product names and quantities from their request.
 Be friendly and conversational. Understand natural language requests like "I want to add apples and grapes" or "add 2 bananas".
-Always use the available tools to modify the cart."""
+Always use the available tools to modify the cart.
+
+Available products: Apple, Banana, Orange, Grapes, Strawberry, Watermelon, Pineapple, Mango, Peach, Cherries, Kiwi, Avocado."""
 )
 
 @agent.tool
