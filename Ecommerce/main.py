@@ -1,7 +1,7 @@
 # app.py
 from fasthtml.common import *
 import asyncio
-from tools import ecommerce_agent_instance, cart_items, get_message_history, AVAILABLE_PRODUCTS
+from tools import ecommerce_agent_instance, cart_items, AVAILABLE_PRODUCTS, clear_message_history
 
 app, rt = fast_app(pico=False)
 
@@ -230,6 +230,9 @@ h3 {
 
 @rt("/")
 def index():
+    # Clear message history and cart on page load to start fresh
+    clear_message_history()
+    cart_items.clear()
     return Titled("E-Commerce Assistant",
         Div(
             ProductsView(),
@@ -294,13 +297,8 @@ def CartView():
     return Div(*children, cls="cart-display", id="cart-container")
 
 def MessagesView():
-    messages = []
-    for msg in get_message_history():
-        if msg.get("kind") == "request":
-            messages.append(Div(Div(msg["text"], cls="message user-message"), cls="message-wrapper"))
-        elif msg.get("kind") == "response":
-            messages.append(Div(Div(msg["text"], cls="message bot-message"), cls="message-wrapper"))
-    return Div(*messages, cls="messages-container", id="messages")
+    # Start with empty messages container - messages will be added dynamically
+    return Div(cls="messages-container", id="messages")
 
 @rt("/send")
 async def send(message: str):

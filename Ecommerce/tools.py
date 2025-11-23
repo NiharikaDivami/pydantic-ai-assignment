@@ -5,11 +5,11 @@ from pydantic_ai import Agent, RunContext
 from dotenv import load_dotenv
 import os
 
-# Load environment variables
+# Load environment variables from .env file
 load_dotenv(override=True)
 
-# Set up Google API key
-os.environ["GOOGLE_API_KEY"] = "AIzaSyBhnmNFSlcu2HLoP2ltKf7cDrofA97dhJw"
+# Google API key will be loaded from .env file
+# Make sure you have GOOGLE_API_KEY set in your .env file
 
 cart_items: Dict[str, int] = {}
 _message_history: List[dict] = []
@@ -37,7 +37,8 @@ agent = Agent(
     system_prompt="""You are a helpful e-commerce shopping assistant.
 You can help users manage their shopping cart by adding items, removing items, showing the cart, and clearing it.
 When users ask to add items, extract the product names and quantities from their request.
-Be friendly and conversational. Understand natural language requests like "I want to add apples and grapes" or "add 2 bananas".
+When users ask to remove items, extract the product name and quantity to remove. If they say "remove one apple", remove quantity 1. If they say "remove all apples" or just "remove apple", you can remove all.
+Be friendly and conversational. Understand natural language requests like "I want to add apples and grapes", "add 2 bananas", or "remove one watermelon".
 Always use the available tools to modify the cart.
 
 Available products: Apple, Banana, Orange, Grapes, Strawberry, Watermelon, Pineapple, Mango, Peach, Cherries, Kiwi, Avocado."""
@@ -51,12 +52,19 @@ def add_to_cart(ctx: RunContext, product: str, quantity: int = 1) -> str:
     return f"Added {quantity} × {product} to the cart."
 
 @agent.tool
-def remove_from_cart(ctx: RunContext, product: str) -> str:
-    """Remove a product from the shopping cart."""
+def remove_from_cart(ctx: RunContext, product: str, quantity: int = 1) -> str:
+    """Remove a specific quantity of a product from the shopping cart. If no quantity specified, removes 1 item."""
     product = product.strip()
     if product in cart_items:
-        del cart_items[product]
-        return f"Removed {product} from the cart."
+        current_qty = cart_items[product]
+        new_qty = current_qty - quantity
+
+        if new_qty <= 0:
+            del cart_items[product]
+            return f"Removed all {product} from the cart."
+        else:
+            cart_items[product] = new_qty
+            return f"Removed {quantity} × {product}. {new_qty} remaining in cart."
     else:
         return f"{product} not found in cart."
 
@@ -96,3 +104,8 @@ ecommerce_agent_instance = EcommerceAgent()
 
 def get_message_history():
     return list(_message_history)
+
+def clear_message_history():
+    """Clear all message history"""
+    global _message_history
+    _message_history = []
