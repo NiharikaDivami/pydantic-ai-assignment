@@ -7,18 +7,12 @@ import time
 # Load .env for API key
 load_dotenv(override=True)
 
-# Get API key from environment
-API_KEY = os.environ.get("GOOGLE_API_KEY")
-if not API_KEY:
-    print("ERROR: API_KEY not found in environment. Please set it in your .env file.")
-    exit(1)
-
 # Configure logfire for cleaner logs (optional)
 logfire.configure()
 logfire.instrument_pydantic_ai()
 
 
-
+os.environ["GOOGLE_API_KEY"] = "AIzaSyBhnmNFSlcu2HLoP2ltKf7cDrofA97dhJw"
 
 # Choose model
 model = "google-gla:gemini-2.5-flash"
